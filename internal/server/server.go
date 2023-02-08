@@ -1,13 +1,11 @@
 package server
 
-import "github.com/sarthakraheja/payments-service/internal/repository"
+import "github.com/sarthakraheja/payments-service/api/v1/github.com/sarthakraheja/payments-service/api"
 
 type server struct {
-	repo repository.Repository
+	api.UnimplementedPaymentsServiceServer
 }
 
-func NewServer(repo repository.Repository) *server {
-	return &server{
-		repo: repo,
-	}
+func NewServer() *server {
+	return &server{}
 }
