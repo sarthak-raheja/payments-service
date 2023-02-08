@@ -10,20 +10,67 @@ service PaymentsService {
   rpc GetPayment(GetPaymentRequest) returns (GetPaymentResponse) {}
 }
 
+
+message PaymentMethodCreditCardDetails{
+    string card_holder_name=1;
+    string credit_card_number=2;
+    string expiry_date=3;
+    string cvv=4;
+}
+
+enum PaymentMethodType{
+    PaymentMethodType_UNSPECIFIED=0;
+    PaymentMethodType_CREDITCARD=1;
+}
+
+enum PaymentStatus{
+    PaymentStatus_UNSPECIFIED=0;
+    PaymentStatus_CREATED=1;
+    PaymentStatus_PROCESSING=2;
+    PaymentStatus_PROCESSED=3;
+    PaymentStatus_COMPLETED=4;
+    PaymentStatus_FAILED=5;
+}
+
+message PaymentMethod{
+    PaymentMethodType payment_method_type=1;
+    oneof payment_methods_details{
+        PaymentMethodCreditCardDetails payment_method_credit_card_details=2; 
+    }    
+}
+
 // The request message containing the user's name.
 message CreatePaymentRequest {
+    string idempotency_key = 1;
+    string amount=2;
+    string currency=3;
+    string marchant_id=4;
+    PaymentMethod payment_method=5;
 }
 
 // The response message containing the greetings
 message CreatePaymentResponse {
+    Payment payment=1;
 }
 
 // The request message containing the user's name.
 message GetPaymentRequest {
+    string id=1;
+    string merchant_id=2;
 }
 
 // The response message containing the greetings
 message GetPaymentResponse {
+    Payment payment=1;
 }
 
+message Payment {
+    string id=1;
+    string idempotency_key=2;
+    string amount=3;
+    string currency=4;
+    string merchant_id=5;
+    PaymentMethod payment_method=6;
+    PaymentStatus payment_status=7;
+}
 
