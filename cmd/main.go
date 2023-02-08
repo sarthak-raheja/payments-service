@@ -19,7 +19,9 @@ const (
 
 func main() {
 	flag.Parse()
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", port))
+	logger := log.Default()
+	logger.Printf("Listening on 9000")
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -29,6 +31,7 @@ func main() {
 
 	newServer := server.NewServer()
 	api.RegisterPaymentsServiceServer(grpcServer, newServer)
+	logger.Printf("Listening on 9000")
 	grpcServer.Serve(lis)
 
 }
