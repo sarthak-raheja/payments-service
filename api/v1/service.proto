@@ -1,0 +1,29 @@
+syntax="proto3";
+
+package api;
+
+option go_package="github.com/sarthakraheja/payments-service/api";
+// The greeting service definition.
+service PaymentsService {
+  // Sends a greeting
+  rpc CreatePayment (CreatePaymentRequest) returns (CreatePaymentResponse) {}
+  rpc GetPayment(GetPaymentRequest) returns (GetPaymentResponse) {}
+}
+
+// The request message containing the user's name.
+message CreatePaymentRequest {
+}
+
+// The response message containing the greetings
+message CreatePaymentResponse {
+}
+
+// The request message containing the user's name.
+message GetPaymentRequest {
+}
+
+// The response message containing the greetings
+message GetPaymentResponse {
+}
+
+
