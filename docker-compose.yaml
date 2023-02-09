@@ -6,5 +6,21 @@ services:
       context: . 
       dockerfile: docker/deploy/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - postgres
     ports:
       - 9000:9000
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: paymentservice
+      POSTGRES_INITDB_SCRIPT: /docker-entrypoint-initdb.d/init.sql
+    ports:
+      - 5432:5432
+    expose:
+      - 5432
+    volumes:
+      - "./docker/db/init.sql:/docker-entrypoint-initdb.d/init.sql"
