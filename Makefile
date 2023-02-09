@@ -8,6 +8,10 @@ docker-down: ## Stop docker containers and clear artefacts.
 	docker system prune 
 
 .PHONY: grpcui-local
-grpcui-local: ## Spin up GRPCIO
+grpcui-local: ## Spin up GRPCUI
 	grpcui -plaintext localhost:9000
+
+.PHONY: codegen
+codegen:
+	protoc --go_out=api/v1/. --go-grpc_out=api/v1/. api/v1/service.proto	
 
