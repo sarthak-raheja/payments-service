@@ -7,6 +7,11 @@ import (
 )
 
 func (s *server) CreatePayment(ctx context.Context, req *api.CreatePaymentRequest) (*api.CreatePaymentResponse, error) {
+	err := s.validator.ValidateCreatePayment(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
 	return nil, nil
 }
 
