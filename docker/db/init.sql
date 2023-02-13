@@ -8,14 +8,3 @@ CREATE TABLE payments (
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
-
-
-CREATE TABLE payment_events (
-  id SERIAL PRIMARY KEY,
-  idempotency_key SERIAL,
-  payment_id serial,
-  status VARCHAR(20) NOT NULL,
-  payment_method VARCHAR(20) NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMP NOT NULL DEFAULT NOW()
-);

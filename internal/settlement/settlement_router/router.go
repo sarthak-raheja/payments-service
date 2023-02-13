@@ -22,9 +22,12 @@ func NewAcquiringBankRouter(acquringBankFactory settlement_factory.AcquringBankF
 }
 
 func (r *router) GetAcquiringBank(payment *model.Payment) (settlement_factory.AcquringBank, error) {
+	// logger := log.Default()
+	// logger.Printf("reached here w payment:%v", payment)
+
 	pm := payment.PaymentMethod
 	if pm == nil {
-		return nil, nil
+		return nil, grpc.Errorf(codes.Unimplemented, "could not determine acquiring bank")
 	}
 
 	switch pm.PaymentMethodType {
@@ -43,4 +46,6 @@ func (r *router) GetAcquiringBank(payment *model.Payment) (settlement_factory.Ac
 	default:
 		return nil, grpc.Errorf(codes.Unimplemented, "could not determine acquiring bank")
 	}
+
+	return nil, grpc.Errorf(codes.Unimplemented, "reached router")
 }

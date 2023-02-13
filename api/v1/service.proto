@@ -51,7 +51,7 @@ message CreatePaymentRequest {
     string idempotency_key = 1;
     string amount=2;
     string currency=3;
-    string marchant_id=4;
+    string merchant_id=4;
     PaymentMethod payment_method=5;
 }
 
@@ -62,8 +62,7 @@ message CreatePaymentResponse {
 
 // The request message containing the user's name.
 message GetPaymentRequest {
-    string id=1;
-    string merchant_id=2;
+    Payment payment=1;
 }
 
 // The response message containing the greetings
