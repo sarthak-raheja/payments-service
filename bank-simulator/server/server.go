@@ -3,11 +3,11 @@ package server
 import (
 	"context"
 	"log"
-	"math/rand"
+	// "math/rand"
 
 	"github.com/sarthakraheja/bank-simulator/protos/v1/github.com/sarthakraheja/bank-simulator/protos"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
+	// "google.golang.org/grpc"
+	// "google.golang.org/grpc/codes"
 )
 
 type server struct {
@@ -18,21 +18,16 @@ func (s *server) CapturePayment(ctx context.Context, req *protos.CapturePaymentR
 	logger := log.Default()
 	logger.Printf("recieved request")
 
-	rand := rand.Int() % 10
-	if rand == 1 || rand == 2 {
-		return nil, grpc.Errorf(codes.Unknown, "unable to fulfil request")
-	}
-
-	return &protos.CapturePaymentResponse{}, grpc.ErrServerStopped
+	return &protos.CapturePaymentResponse{}, nil
 }
 
 func (s *server) AuthorisePayment(ctx context.Context, req *protos.AuthorisePaymentRequest) (*protos.AuthorisePaymentResponse, error) {
-	rand := rand.Int() % 10
-	if rand == 1 || rand == 2 {
-		return nil, grpc.Errorf(codes.Unknown, "unable to fulfil request")
-	}
+	// rand := rand.Int() % 10
+	// if rand == 1 || rand == 2 {
+	// 	return nil, grpc.Errorf(codes.Unknown, "unable to fulfil request")
+	// }
 
-	return &protos.AuthorisePaymentResponse{}, grpc.ErrServerStopped
+	return &protos.AuthorisePaymentResponse{}, nil
 }
 
 func NewServer() *server {

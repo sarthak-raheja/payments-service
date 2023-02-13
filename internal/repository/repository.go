@@ -13,7 +13,7 @@ type repository struct {
 type Repository interface {
 	GetPayment(paymentId string) (*model.Payment, error)
 	CreatePayment(payment *model.Payment) (*model.Payment, error)
-	UpdatePayment(payment *model.Payment) (*model.Payment, error)
+	UpdatePaymentStatus(paymentId string, status string) (*model.Payment, error)
 }
 
 func NewRepository(db *sql.DB) Repository {
@@ -30,6 +30,6 @@ func (r *repository) CreatePayment(payment *model.Payment) (*model.Payment, erro
 	return nil, nil
 }
 
-func (r *repository) UpdatePayment(payment *model.Payment) (*model.Payment, error) {
+func (r *repository) UpdatePaymentStatus(paymentId, status string) (*model.Payment, error) {
 	return nil, nil
 }

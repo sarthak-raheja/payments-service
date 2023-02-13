@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"flag"
 	"fmt"
@@ -13,6 +12,8 @@ import (
 	"github.com/sarthakraheja/payments-service/internal/processor"
 	"github.com/sarthakraheja/payments-service/internal/repository"
 	"github.com/sarthakraheja/payments-service/internal/server"
+	"github.com/sarthakraheja/payments-service/internal/settlement/settlement_factory"
+	"github.com/sarthakraheja/payments-service/internal/settlement/settlement_router"
 	"github.com/sarthakraheja/payments-service/internal/validator"
 
 	_ "github.com/lib/pq"
@@ -52,19 +53,15 @@ func main() {
 		panic(err)
 	}
 
-	repository := repository.NewRepository(db)
-	validator := validator.NewValidator()
-	processor := processor.NewProcessor(repository)
-
 	conn, err := grpc.Dial(bankSimulatorAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	bankingClient := bankSimulator.NewAcquiringBankServiceClient(conn)
 
-	resp, err := bankingClient.AuthorisePayment(context.Background(), &bankSimulator.AuthorisePaymentRequest{})
-	if err != nil {
-		logger.Fatal(err)
-	}
+	settlementFactory := settlement_factory.NewAcquiringBankFactory(bankingClient)
+	settlementRouter := settlement_router.NewAcquiringBankRouter(settlementFactory)
 
-	logger.Printf("resp: %v", resp)
+	repository := repository.NewRepository(db)
+	validator := validator.NewValidator()
+	processor := processor.NewProcessor(repository, settlementRouter)
 
 	server := server.NewServer(repository, validator, processor)
 
