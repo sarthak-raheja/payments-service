@@ -5,6 +5,9 @@ import (
 	"log"
 	"net"
 
+	"github.com/sarthakraheja/bank-simulator/protos/v1/github.com/sarthakraheja/bank-simulator/protos"
+	"github.com/sarthakraheja/bank-simulator/server"
+
 	"google.golang.org/grpc"
 )
 
@@ -20,7 +23,10 @@ func main() {
 
 	fmt.Println("listening on 9090")
 
+	acquiringBankServer := server.NewServer()
 	grpcServer := grpc.NewServer()
-	grpcServer.Serve(lis)
 
+	protos.RegisterAcquiringBankServiceServer(grpcServer, acquiringBankServer)
+
+	grpcServer.Serve(lis)
 }

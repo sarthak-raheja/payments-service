@@ -1,4 +1,4 @@
-FROM golang:1.18
+FROM golang:1.19
 
 WORKDIR /app
 
@@ -8,8 +8,8 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o bank-simulator/bin/app bank-simulator/cmd/main.go
+RUN go build -o bin/app cmd/main.go
 
 EXPOSE 9090
 
-CMD ["./bank-simulator/bin/app"]
+CMD ["./bin/app"]

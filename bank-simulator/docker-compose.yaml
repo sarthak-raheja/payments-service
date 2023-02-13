@@ -1,0 +1,10 @@
+version: '3.7'
+
+services:
+  bank-simulator:
+    build:
+      context: . 
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    ports:
+      - 9090:9090
