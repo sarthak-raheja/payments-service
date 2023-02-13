@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"flag"
 	"fmt"
 	"log"
 	"net"
 
+	bankSimulator "github.com/sarthakraheja/bank-simulator/protos/v1/github.com/sarthakraheja/bank-simulator/protos"
 	"github.com/sarthakraheja/payments-service/api/v1/github.com/sarthakraheja/payments-service/api"
 	"github.com/sarthakraheja/payments-service/internal/processor"
 	"github.com/sarthakraheja/payments-service/internal/repository"
@@ -15,17 +17,19 @@ import (
 
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 )
 
 // TODO: Move these to a config file
 const (
-	port     = "9000"
-	host     = "host.docker.internal"
-	dbport   = 5432
-	user     = "myuser"
-	password = "mypassword"
-	dbname   = "paymentservice"
+	port              = "9000"
+	host              = "host.docker.internal"
+	dbport            = 5432
+	user              = "myuser"
+	password          = "mypassword"
+	dbname            = "paymentservice"
+	bankSimulatorAddr = "host.docker.internal:9090"
 )
 
 func main() {
@@ -51,6 +55,16 @@ func main() {
 	repository := repository.NewRepository(db)
 	validator := validator.NewValidator()
 	processor := processor.NewProcessor(repository)
+
+	conn, err := grpc.Dial(bankSimulatorAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	bankingClient := bankSimulator.NewAcquiringBankServiceClient(conn)
+
+	resp, err := bankingClient.AuthorisePayment(context.Background(), &bankSimulator.AuthorisePaymentRequest{})
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	logger.Printf("resp: %v", resp)
 
 	server := server.NewServer(repository, validator, processor)
 
