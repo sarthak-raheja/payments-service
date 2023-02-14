@@ -63,7 +63,6 @@ func main() {
 	settlementRouter := settlement_router.NewAcquiringBankRouter(settlementFactory)
 
 	key, _ := hex.DecodeString("6368616e676520746869732070617373776f726420746f206120736563726574")
-
 	cipher := cipher.NewCipher(key)
 
 	repository := repository.NewRepository(db, cipher)

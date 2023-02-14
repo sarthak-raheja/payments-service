@@ -1,4 +1,4 @@
-Payments Service
+Payments Gateway
 
 Product requirements for the payments service
 
@@ -14,7 +14,7 @@ The server runs on localhost:9000 and serves the following RPC calls:
     GetPayment(GetPaymentRequest) returns GetPaymentResponse
 
 
-Setting up the payments service: 
+Setting up the payments gateway: 
 
 Note: The service directory also includess the bank simulator(./bank-simulator), which is required for the payments service to be able to fulfil payments request. 
 
@@ -31,13 +31,13 @@ Code features:
 1. High level technical spec: PostgresDB with grpc server. 
 2. Modular pattern providing flexiblity for datastore, api choice(rest vs grpc).
 3. Unit tested individual components
-4. Encrypted storage of sensitive field using symmetric encryption
+4. [Bonus]Encrypted storage of sensitive field using symmetric encryption
 5. Factory pattern for connecting to different kinds of acquiring banks encapsulated in the setttlement package
 6. input validation for generic payment data parsing
 7. Extensible APIs to enable processing of different kind of payment.(Wire Transfers etc)
-8. Fully fledged Makefile in order to generate codegen for protos mock,files. running and stopping servers.
-9. Named imports in order to easily undertand the different internal and external libraries the service depends on. 
-10. The CreatePayment rpc call is idempotent to prevent duplicate requests and charges to the end client.
+8. [Bonus] Fully fledged Makefile in order to generate codegen for protos mock,files. running and stopping servers.
+9. [Bonus] Grouped imports in order to easily undertand the different internal and external libraries the service depends on. 
+10. [Bonus]The CreatePayment rpc call is idempotent to prevent duplicate requests and charges to the end client.
 
 
 Tooling suport:
@@ -49,13 +49,17 @@ Tooling suport:
 Areas of Improvement
 1. Error handling needs to be improved as it can be more user friendly as currently it leaks out internal logic of the service. 
 2. The data model can be improved for memory efficient storage (storing the encrypted payment method is currently expensive)
-3. Improved monitoring, currently we are not logging through the lifecycle of the request.
+3. Improved monitoring, currently we are not logging anywhere throughout the lifecycle of the request.
+4. Integration testing
+5. Would want to spin up the bank simulator as part of the boot up process for payment-simulator.  Ran into an issue when attempting to set that up. 
 
 Assumptions:
 1. We can succesfully process a payment synchronously
+2. The acquiring bank interface provides the Authorise and Capture payment method
+3. We can have multiple acquiring bank.
+4. Routing based on creditCard type but can be extended to arbritary rules as needed.
 
 
 Known Issues:
-1. Payment Status not populating in the database due to issue with formatting of the defined string wrapper for payment status. 
-2. Obfuscating the fields in response. Need to write some utils method that can replace sensitive fields in the response with 'x's
-3. Some modules(processor,server) are not unit tested.
+1. Currently obfuscation is being done at the handler level, would want to move that over to the model file. 
+2. Some modules(processor,server) are not currentlyunit tested.
