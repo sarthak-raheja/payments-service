@@ -1,6 +1,7 @@
 CREATE TABLE payments (
   id SERIAL PRIMARY KEY,
   idempotency_key SERIAL UNIQUE,
+  merchant_id SERIAL,
   amount VARCHAR(64) NOT NULL,
   currency VARCHAR(3) NOT NULL,
   payment_status VARCHAR(20) NOT NULL,
