@@ -43,6 +43,9 @@ func (p *processor) ProcessPayment(req *ProcessPaymentRequest) (*ProcessPaymentR
 		return nil, grpc.Errorf(codes.Unavailable, "could not capture payment")
 	}
 
+	_ = p.repo.UpdatePaymentStatus(payment.Id, model.PaymentStatus_Completed)
+	payment.PaymentStatus = model.PaymentStatus_Completed
+
 	return &ProcessPaymentResponse{
 		Payment: payment,
 	}, nil
