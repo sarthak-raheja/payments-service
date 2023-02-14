@@ -5,6 +5,7 @@ import (
 
 	"github.com/sarthakraheja/payments-service/api/v1/github.com/sarthakraheja/payments-service/api"
 	"github.com/sarthakraheja/payments-service/internal/processor"
+	"github.com/sarthakraheja/payments-service/internal/utils"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -37,6 +38,9 @@ func (s *server) CreatePayment(ctx context.Context, req *api.CreatePaymentReques
 	if err != nil {
 		return nil, err
 	}
+
+	payment = utils.ObfuscateSensitiveFields(payment)
+
 	return &api.CreatePaymentResponse{
 		Payment: payment,
 	}, nil
@@ -58,6 +62,8 @@ func (s *server) GetPayment(ctx context.Context, req *api.GetPaymentRequest) (*a
 	if err != nil {
 		return nil, err
 	}
+
+	payment = utils.ObfuscateSensitiveFields(payment)
 
 	return &api.GetPaymentResponse{
 		Payment: payment,

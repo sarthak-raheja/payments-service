@@ -4,7 +4,7 @@ Product requirements for the payments service
 
 1. A merchant should be able to process a payment through the payment gateway and receive either a successful or unsuccessful response. 
 
-2. A merchant should be able to retrieve the details of a previously made payment. The next section will discuss each of these in more detail.
+2. A merchant should be able to retrieve the details of a previously made payment.
 
 Requirements:
 The payment gateway will need to provide merchants with a way to process a payment. To do this, the merchant should be able to submit a request to the payment gateway. A payment request should include appropriate fields such as the card number, expiry month/date, amount, currency, and cvv.
@@ -42,10 +42,20 @@ Code features:
 
 Tooling suport:
 
-1. Grpcui for interacting with the server through a easy to use UI
-2. pgAdmin4 in order to perform read and query operation w the database. 
+1. Grpcui for interacting with the server through a easy to use UI (https://github.com/fullstorydev/grpcui)
+2. pgAdmin4 in order to perform read and query operation w the database. (https://www.postgresql.org/ftp/pgadmin/pgadmin4/)
 
 
 Areas of Improvement
 1. Error handling needs to be improved as it can be more user friendly as currently it leaks out internal logic of the service. 
 2. The data model can be improved for memory efficient storage (storing the encrypted payment method is currently expensive)
+3. Improved monitoring, currently we are not logging through the lifecycle of the request.
+
+Assumptions:
+1. We can succesfully process a payment synchronously
+
+
+Known Issues:
+1. Payment Status not populating in the database due to issue with formatting of the defined string wrapper for payment status. 
+2. Obfuscating the fields in response. Need to write some utils method that can replace sensitive fields in the response with 'x's
+3. Some modules(processor,server) are not unit tested.

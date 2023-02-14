@@ -45,6 +45,7 @@ func (r *repository) GetPayment(paymentId string) (*model.Payment, error) {
 		var (
 			id             string
 			idempotencyKey string
+			merchantId     string
 			amount         string
 			currency       string
 			paymentStatus  string
@@ -53,7 +54,7 @@ func (r *repository) GetPayment(paymentId string) (*model.Payment, error) {
 			updatedAt      string
 		)
 
-		if err := rows.Scan(&id, &idempotencyKey, &amount, &currency, &paymentStatus, &paymentMethod, &createdAt, &updatedAt); err != nil {
+		if err := rows.Scan(&id, &idempotencyKey, &merchantId, &amount, &currency, &paymentStatus, &paymentMethod, &createdAt, &updatedAt); err != nil {
 			return nil, err
 		}
 
@@ -70,9 +71,11 @@ func (r *repository) GetPayment(paymentId string) (*model.Payment, error) {
 		payment = &model.Payment{
 			Id:             id,
 			IdempotencyKey: idempotencyKey,
+			MerchantId:     merchantId,
 			Amount:         amount,
 			Currency:       currency,
 			PaymentMethod:  pm,
+			PaymentStatus:  model.PaymentStatus(paymentStatus),
 		}
 	}
 	if payment == nil {
@@ -95,7 +98,7 @@ func (r *repository) CreatePayment(payment *model.Payment) (*model.Payment, erro
 
 	hexPm := hex.EncodeToString(encryptedPm)
 
-	sqlStatement := fmt.Sprintf(`INSERT INTO payments (idempotency_key, amount,currency,payment_status,payment_method) VALUES (%v,%v,'%v','%v','%v') RETURNING id`, payment.IdempotencyKey, payment.Amount, payment.Currency, payment.PaymentStatus, hexPm)
+	sqlStatement := fmt.Sprintf(`INSERT INTO payments (idempotency_key,merchant_id, amount,currency,payment_status,payment_method) VALUES (%v,%v,%v,'%v','%v','%v') RETURNING id`, payment.IdempotencyKey, payment.MerchantId, payment.Amount, payment.Currency, payment.PaymentStatus, hexPm)
 
 	id := 0
 	err = r.db.QueryRow(sqlStatement).Scan(&id)
@@ -110,7 +113,7 @@ func (r *repository) CreatePayment(payment *model.Payment) (*model.Payment, erro
 
 func (r *repository) UpdatePaymentStatus(paymentId string, paymentStatus model.PaymentStatus) error {
 	paymentIdTable, _ := strconv.Atoi(paymentId)
-	sqlStatement := fmt.Sprintf(`UPDATE payments SET (payment_status) VALUES ('%v') where ID=%v`, paymentStatus, paymentIdTable)
+	sqlStatement := fmt.Sprintf(`UPDATE payments SET payment_status='%v' WHERE ID=%v`, paymentStatus, paymentIdTable)
 
 	_, err := r.db.Exec(sqlStatement)
 	if err != nil {
