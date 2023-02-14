@@ -2,8 +2,16 @@ package settlement_factory
 
 import (
 	bankSimulator "github.com/sarthakraheja/bank-simulator/protos/v1/github.com/sarthakraheja/bank-simulator/protos"
+	"github.com/sarthakraheja/payments-service/internal/model"
 )
 
+// AcquringBank interface
+type AcquringBank interface {
+	AuthorizePayment(payment *model.Payment) error
+	CapturePayment(*model.Payment) error
+}
+
+// Factory interface
 type acquringBankFactory struct {
 	acquiringBankClient bankSimulator.AcquiringBankServiceClient
 }

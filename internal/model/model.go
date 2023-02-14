@@ -5,12 +5,12 @@ type PaymentMethodType string
 type CreditCardType string
 
 const (
-	PaymentStatus_Created    PaymentStatus = "PaymentStatus_Created"
-	PaymentStatus_Processing PaymentStatus = "PaymentStatus_Processing"
-	PaymentStatus_Processed  PaymentStatus = "PaymentStatus_Processed"
-	PaymentStatus_Settled    PaymentStatus = "PaymentStatus_Settled"
-	PaymentStatus_Completed  PaymentStatus = "PaymentStatus_Completed"
-	PaymentStatus_Failed     PaymentStatus = "PaymentStatus_Failed"
+	PaymentStatus_Created    PaymentStatus = "created"
+	PaymentStatus_Processing PaymentStatus = "processing"
+	PaymentStatus_Processed  PaymentStatus = "processed"
+	PaymentStatus_Settled    PaymentStatus = "settled"
+	PaymentStatus_Completed  PaymentStatus = "completed"
+	PaymentStatus_Failed     PaymentStatus = "failed"
 )
 
 const (
@@ -24,16 +24,16 @@ const (
 )
 
 type PaymentMethodCreditCard struct {
-	CardHolderName   string
-	CreditCardNumber string
-	ExpiryDate       string
-	Cvv              string
-	CreditCardType   CreditCardType
+	CardHolderName   string         `json:"card_holder_name"`
+	CreditCardNumber string         `json:"credit_card_number"`
+	ExpiryDate       string         `json:"expiry_date"`
+	Cvv              string         `json:"cvv"`
+	CreditCardType   CreditCardType `json:"credit_card_type"`
 }
 
 type PaymentMethod struct {
-	PaymentMethodType       PaymentMethodType
-	PaymentMethodCreditCard *PaymentMethodCreditCard
+	PaymentMethodType       PaymentMethodType        `json:"payment_method_type"`
+	PaymentMethodCreditCard *PaymentMethodCreditCard `json:"payment_method_credit_card,omitempty"`
 }
 
 type Payment struct {

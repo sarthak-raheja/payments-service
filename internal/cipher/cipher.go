@@ -13,8 +13,8 @@ type cipher struct {
 }
 
 type Cipher interface {
-	Encrypt(plaintext []byte, key []byte) ([]byte, error)
-	Decrypt(ciphertext []byte, key []byte) ([]byte, error)
+	Encrypt(plaintext []byte) ([]byte, error)
+	Decrypt(ciphertext []byte) ([]byte, error)
 }
 
 func NewCipher(key []byte) Cipher {
@@ -23,8 +23,8 @@ func NewCipher(key []byte) Cipher {
 	}
 }
 
-func (c *cipher) Encrypt(plaintext []byte, key []byte) ([]byte, error) {
-	aesBlock, err := aes.NewCipher(key)
+func (c *cipher) Encrypt(plaintext []byte) ([]byte, error) {
+	aesBlock, err := aes.NewCipher(c.key)
 	if err != nil {
 		return nil, err
 	}
@@ -42,8 +42,8 @@ func (c *cipher) Encrypt(plaintext []byte, key []byte) ([]byte, error) {
 	return gcm.Seal(nonce, nonce, plaintext, nil), nil
 }
 
-func (c *cipher) Decrypt(ciphertext []byte, key []byte) ([]byte, error) {
-	aesBlock, err := aes.NewCipher(key)
+func (c *cipher) Decrypt(ciphertext []byte) ([]byte, error) {
+	aesBlock, err := aes.NewCipher(c.key)
 	if err != nil {
 		return nil, err
 	}
