@@ -18,8 +18,18 @@ type ProcessPaymentResponse struct {
 	Payment *model.Payment
 }
 
+type GetPaymentRequest struct {
+	Id         string
+	MerchantId string
+}
+
+type GetPaymentResponse struct {
+	Payment *model.Payment
+}
+
 type Processor interface {
 	ProcessPayment(*ProcessPaymentRequest) (*ProcessPaymentResponse, error)
+	GetPayment(*GetPaymentRequest) (*GetPaymentResponse, error)
 }
 
 func NewProcessor(repo repository.Repository, settlementRouter settlement_router.AcquiringBankRouter) Processor {

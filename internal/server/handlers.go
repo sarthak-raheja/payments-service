@@ -43,5 +43,23 @@ func (s *server) CreatePayment(ctx context.Context, req *api.CreatePaymentReques
 }
 
 func (s *server) GetPayment(ctx context.Context, req *api.GetPaymentRequest) (*api.GetPaymentResponse, error) {
-	return nil, nil
+
+	getPaymentRequest := &processor.GetPaymentRequest{
+		Id:         req.GetId(),
+		MerchantId: req.GetMerchantId(),
+	}
+
+	processorResp, err := s.processor.GetPayment(getPaymentRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	payment, err := s.marshaller.MarshalPayment(processorResp.Payment)
+	if err != nil {
+		return nil, err
+	}
+
+	return &api.GetPaymentResponse{
+		Payment: payment,
+	}, nil
 }
