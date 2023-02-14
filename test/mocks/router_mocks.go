@@ -2,7 +2,7 @@
 // Source: internal/settlement/settlement_router/router.go
 
 // Package mock_settlement_router is a generated GoMock package.
-package mock_settlement_router
+package mocks
 
 import (
 	reflect "reflect"
