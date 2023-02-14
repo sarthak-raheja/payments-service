@@ -58,11 +58,6 @@ func (p *processor) GetPayment(req *GetPaymentRequest) (*GetPaymentResponse, err
 		return nil, fmt.Errorf("could not find payment")
 	}
 
-	// validate merchantId matches request
-	// if payment.MerchantId != req.MerchantId {
-	// 	return nil, fmt.Errorf("could not validate merchant Id")
-	// }
-
 	return &GetPaymentResponse{
 		Payment: payment,
 	}, nil
