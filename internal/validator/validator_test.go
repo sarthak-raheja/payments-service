@@ -21,7 +21,6 @@ func NewValidatorTestSuite(t *testing.T) ValidatorTestSuite {
 	validator := validator.NewValidator()
 
 	return ValidatorTestSuite{
-
 		validator: validator,
 	}
 }

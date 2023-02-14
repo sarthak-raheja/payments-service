@@ -4,38 +4,42 @@ import (
 	"context"
 
 	"github.com/sarthakraheja/payments-service/api/v1/github.com/sarthakraheja/payments-service/api"
-	"github.com/sarthakraheja/payments-service/internal/model"
 	"github.com/sarthakraheja/payments-service/internal/processor"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 )
 
 func (s *server) CreatePayment(ctx context.Context, req *api.CreatePaymentRequest) (*api.CreatePaymentResponse, error) {
 	err := s.validator.ValidateCreatePayment(ctx, req)
 	if err != nil {
-		return nil, err
+		return nil, grpc.Errorf(codes.InvalidArgument, "error: %v", err)
 	}
 
+	pm, err := s.unmarshaller.UnmarshallPaymentMethod(req.GetPaymentMethod())
+	if err != nil {
+		return nil, grpc.Errorf(codes.InvalidArgument, "error: %v", err)
+	}
 	processorPaymentRequest := &processor.ProcessPaymentRequest{
-		IdempotencyKey: "123",
-		Amount:         "100.00",
-		Currency:       "USD",
-		MerchantId:     "123",
-		PaymentMethod: &model.PaymentMethod{
-			PaymentMethodType: model.PaymentMethodType_CreditCard,
-			PaymentMethodCreditCard: &model.PaymentMethodCreditCard{
-				CardHolderName:   "hello",
-				CreditCardNumber: "123232",
-				ExpiryDate:       "12-04",
-				Cvv:              "222",
-				CreditCardType:   model.CreditCardType_Amex,
-			},
-		},
+		IdempotencyKey: req.GetIdempotencyKey(),
+		Amount:         req.GetAmount(),
+		Currency:       req.GetCurrency(),
+		MerchantId:     req.GetMerchantId(),
+		PaymentMethod:  pm,
 	}
 
-	_, err = s.processor.ProcessPayment(processorPaymentRequest)
+	processorResp, err := s.processor.ProcessPayment(processorPaymentRequest)
 	if err != nil {
 		return nil, err
 	}
-	return &api.CreatePaymentResponse{}, nil
+
+	payment, err := s.marshaller.MarshalPayment(processorResp.Payment)
+	if err != nil {
+		return nil, err
+	}
+	return &api.CreatePaymentResponse{
+		Payment: payment,
+	}, nil
 }
 
 func (s *server) GetPayment(ctx context.Context, req *api.GetPaymentRequest) (*api.GetPaymentResponse, error) {

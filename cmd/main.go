@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/hex"
 	"flag"
 	"fmt"
 	"log"
@@ -9,11 +10,14 @@ import (
 
 	bankSimulator "github.com/sarthakraheja/bank-simulator/protos/v1/github.com/sarthakraheja/bank-simulator/protos"
 	"github.com/sarthakraheja/payments-service/api/v1/github.com/sarthakraheja/payments-service/api"
+	"github.com/sarthakraheja/payments-service/internal/cipher"
+	"github.com/sarthakraheja/payments-service/internal/marshaller"
 	"github.com/sarthakraheja/payments-service/internal/processor"
 	"github.com/sarthakraheja/payments-service/internal/repository"
 	"github.com/sarthakraheja/payments-service/internal/server"
 	"github.com/sarthakraheja/payments-service/internal/settlement/settlement_factory"
 	"github.com/sarthakraheja/payments-service/internal/settlement/settlement_router"
+	"github.com/sarthakraheja/payments-service/internal/unmarshaller"
 	"github.com/sarthakraheja/payments-service/internal/validator"
 
 	_ "github.com/lib/pq"
@@ -36,7 +40,6 @@ const (
 func main() {
 	flag.Parse()
 	logger := log.Default()
-	logger.Printf("Listening on 9000")
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, dbport, user, password, dbname)
@@ -59,11 +62,17 @@ func main() {
 	settlementFactory := settlement_factory.NewAcquiringBankFactory(bankingClient)
 	settlementRouter := settlement_router.NewAcquiringBankRouter(settlementFactory)
 
-	repository := repository.NewRepository(db)
+	key, _ := hex.DecodeString("6368616e676520746869732070617373776f726420746f206120736563726574")
+
+	cipher := cipher.NewCipher(key)
+
+	repository := repository.NewRepository(db, cipher)
 	validator := validator.NewValidator()
 	processor := processor.NewProcessor(repository, settlementRouter)
 
-	server := server.NewServer(repository, validator, processor)
+	unmarshaller := unmarshaller.NewUnmarshaller()
+	marshaller := marshaller.NewMarshaller()
+	server := server.NewServer(repository, validator, processor, unmarshaller, marshaller)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {

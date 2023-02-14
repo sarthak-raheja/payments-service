@@ -7,41 +7,47 @@ import (
 	"github.com/sarthakraheja/payments-service/internal/model"
 )
 
-type unmarshaller struct{}
-
-type Unmarshaller interface {
-	UnmarshallPaymentMethod(*api.PaymentMethod) (*models.PaymentMethod, error)
-}
-
-// NewUnmarshaller returns an interface for the Unmarshaller.
-// Usage: Handles the transformation from protobuf to internal models
-// format for GRPC.
-func NewUnmarshaller() Unmarshaller {
-	return unmarshaller{}
-}
-
-func (u *unmarshaller) unmarshallCreditCardPaymentMethod(creditCardPm *api.PaymentMethodCreditCardDetails) (*models.PaymentMethodCreditCard, error) {
+func (u *unmarshaller) unmarshallCreditCardPaymentMethod(creditCardPm *api.PaymentMethodCreditCardDetails) (*model.PaymentMethodCreditCard, error) {
 	if creditCardPm == nil {
 		return nil, fmt.Errorf("unable to unmarshall nil credit card details")
 	}
 
-	return &model.CreditCardDetails{}, nil
+	creditCardType := u.resolveCreditCardType(creditCardPm.GetCreditCardType())
+
+	return &model.PaymentMethodCreditCard{
+		CardHolderName:   creditCardPm.GetCardHolderName(),
+		CreditCardNumber: creditCardPm.GetCreditCardNumber(),
+		ExpiryDate:       creditCardPm.GetExpiryDate(),
+		Cvv:              creditCardPm.GetCvv(),
+		CreditCardType:   creditCardType,
+	}, nil
 
 }
 
-func (u *unmarshaller) UnmarshallPaymentMethod(pm *api.PaymentMethod) (*models.PaymentMethod, error) {
-	var paymentMethod *model.PaymentMethod
+func (u *unmarshaller) resolveCreditCardType(creditCardType api.CreditCardType) model.CreditCardType {
+	switch creditCardType {
+	case api.CreditCardType_CreditCardType_AMEX:
+		return model.CreditCardType_Amex
+	case api.CreditCardType_CreditCardType_VISA:
+		return model.CreditCardType_Visa
+	case api.CreditCardType_CreditCardType_MASTERCARD:
+		return model.CreditCardType_MasterCard
+	}
+	return model.CreditCardType("")
+}
+
+func (u *unmarshaller) UnmarshallPaymentMethod(pm *api.PaymentMethod) (*model.PaymentMethod, error) {
+	paymentMethod := &model.PaymentMethod{}
 	if pm == nil {
 		return nil, fmt.Errorf("unable to unmarshall nil payment method")
 	}
 
-	pmType, err := pm.GetPaymentMethodType()
-	if err != nil {
-		return nil, fmt.Errorf("unable to determine payment method type")
-	}
+	pmType := pm.GetPaymentMethodType()
 
-	if pmType == api.PaymentMethodType_CREDITCARD {
-		creditCardDetails, err := u.unmarshallCreditCardPaymentMethod(PaymentMethodCreditCardDetails)
+	if pmType == api.PaymentMethodType_PaymentMethodType_CREDITCARD {
+		ccApi := pm.GetPaymentMethodCreditCardDetails()
+
+		creditCardDetails, err := u.unmarshallCreditCardPaymentMethod(ccApi)
 		if err != nil {
 			return nil, fmt.Errorf("unable to unmarshall credit card details")
 		}
