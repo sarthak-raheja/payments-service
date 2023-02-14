@@ -18,7 +18,7 @@ Setting up the payments service:
 
 Note: The service directory also includess the bank simulator(./bank-simulator), which is required for the payments service to be able to fulfil payments request. 
 
-1. Navigate to /bank-simulator. Run cmd: 'make docker-up' while at bank-simulator. 
+1. [Pre-requisite] Navigate to /bank-simulator. Run cmd: 'make docker-up' while at bank-simulator. 
     This will spin up the bank simulator which is a grpc server that runs on port 9090.
 2. Open a new terminal tab, and navigate back to /payments-service. the root directory of this repository. Run cmd: 'make docker-up'
     This will spin up a postgres db with payments table, as well as a grpc server that runs on port 9000
@@ -36,6 +36,8 @@ Code features:
 6. input validation for generic payment data parsing
 7. Extensible APIs to enable processing of different kind of payment.(Wire Transfers etc)
 8. Fully fledged Makefile in order to generate codegen for protos mock,files. running and stopping servers.
+9. Named imports in order to easily undertand the different internal and external libraries the service depends on. 
+10. The CreatePayment rpc call is idempotent to prevent duplicate requests and charges to the end client.
 
 
 Tooling suport:
@@ -45,3 +47,5 @@ Tooling suport:
 
 
 Areas of Improvement
+1. Error handling needs to be improved as it can be more user friendly as currently it leaks out internal logic of the service. 
+2. The data model can be improved for memory efficient storage (storing the encrypted payment method is currently expensive)

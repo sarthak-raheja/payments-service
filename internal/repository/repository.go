@@ -19,7 +19,7 @@ type repository struct {
 type Repository interface {
 	GetPayment(paymentId string) (*model.Payment, error)
 	CreatePayment(payment *model.Payment) (*model.Payment, error)
-	UpdatePaymentStatus(paymentId string, status string) error
+	UpdatePaymentStatus(paymentId string, status model.PaymentStatus) error
 }
 
 func NewRepository(db *sql.DB, cipher cipher.Cipher) Repository {
@@ -108,9 +108,9 @@ func (r *repository) CreatePayment(payment *model.Payment) (*model.Payment, erro
 	return payment, nil
 }
 
-func (r *repository) UpdatePaymentStatus(paymentId string, paymentStatus string) error {
+func (r *repository) UpdatePaymentStatus(paymentId string, paymentStatus model.PaymentStatus) error {
 	paymentIdTable, _ := strconv.Atoi(paymentId)
-	sqlStatement := fmt.Sprintf(`UPDATE * payments SET (payment_status) VALUES ('%v') where ID=%v`, paymentStatus, paymentIdTable)
+	sqlStatement := fmt.Sprintf(`UPDATE payments SET (payment_status) VALUES ('%v') where ID=%v`, paymentStatus, paymentIdTable)
 
 	_, err := r.db.Exec(sqlStatement)
 	if err != nil {

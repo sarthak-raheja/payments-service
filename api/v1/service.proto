@@ -62,17 +62,13 @@ message CreatePaymentResponse {
 
 // The request message containing the user's name.
 message GetPaymentRequest {
-    Payment payment=1;
+    string id=1;
+    string merchant_id=2;
 }
 
 // The response message containing the greetings
 message GetPaymentResponse {
-    string id=1;
-    string idempotency_key=2;
-    string amount=3;
-    string currency=4;
-    string merchant_id=5;
-    PaymentStatus payment_status=6;
+    Payment payment=1;
 }
 
 message Payment {

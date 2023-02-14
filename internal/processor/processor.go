@@ -1,6 +1,8 @@
 package processor
 
 import (
+	"fmt"
+
 	"github.com/sarthakraheja/payments-service/internal/model"
 	"github.com/sarthakraheja/payments-service/internal/repository"
 	"github.com/sarthakraheja/payments-service/internal/settlement/settlement_router"
@@ -30,16 +32,35 @@ func (p *processor) ProcessPayment(req *ProcessPaymentRequest) (*ProcessPaymentR
 	// Authorize Payment
 	err = acquiringBank.AuthorizePayment(payment)
 	if err != nil {
+		_ = p.repo.UpdatePaymentStatus(payment.Id, model.PaymentStatus_Failed)
 		return nil, grpc.Errorf(codes.Unauthenticated, "could not authorize payment")
 	}
 
 	// Capture Payment
 	err = acquiringBank.CapturePayment(payment)
 	if err != nil {
+		_ = p.repo.UpdatePaymentStatus(payment.Id, model.PaymentStatus_Failed)
 		return nil, grpc.Errorf(codes.Unavailable, "could not capture payment")
 	}
 
 	return &ProcessPaymentResponse{
+		Payment: payment,
+	}, nil
+}
+
+func (p *processor) GetPayment(req *GetPaymentRequest) (*GetPaymentResponse, error) {
+
+	payment, err := p.repo.GetPayment(req.Id)
+	if err != nil {
+		return nil, fmt.Errorf("could not find payment")
+	}
+
+	// validate merchantId matches request
+	// if payment.MerchantId != req.MerchantId {
+	// 	return nil, fmt.Errorf("could not validate merchant Id")
+	// }
+
+	return &GetPaymentResponse{
 		Payment: payment,
 	}, nil
 }
