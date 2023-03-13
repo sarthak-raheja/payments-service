@@ -63,6 +63,3 @@ Assumptions:
 Known Issues:
 1. Currently obfuscation is being done at the handler level, would want to move that over to the model file. 
 2. Some modules(processor,server) are not currentlyunit tested.
-
-
-Design Doc for more details: https://docs.google.com/document/d/1n-L3vI89nAXaH5CSr0snrFsXOTQsBnrOlXg4c5gAVRM/edit
